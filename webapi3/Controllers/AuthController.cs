@@ -33,8 +33,53 @@ namespace webapi3.Controllers
         public async Task<IActionResult> Register([FromBody]RegisterVM registerVM)
         {
             var IsExist = await userManager.FindByNameAsync(registerVM.Name);
-            return null;
-        }
+            if (IsExist != null)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Status = "Error",
+                    Message = "User already exists!"
+                });
+            }
 
+            AppUser appUser = new AppUser
+            {
+                    UserName = registerVM.Name,
+                    AccountType = registerVM.AccountTypes,
+                    Email = registerVM.Email,
+                    PhoneNumber = registerVM.PhoneNo,
+                    Password = registerVM.Password,
+                    ShopName = registerVM.ShopName,
+                    BusinessType = registerVM.BusinessType,
+                    UserRole = registerVM.UserRole,
+                    IsDeleted = registerVM.IsDeleted
+            };
+
+            var result = await userManager.CreateAsync(appUser, registerVM.Password);
+
+            if (!result.Succeeded) {
+               return StatusCode(StatusCodes.Status500InternalServerError, new Response
+               {
+                    Status = "Error",
+                    Message = "User creation failed! Please check details and try again"
+               });
+            }
+
+            if (!await roleManager.RoleExistsAsync(registerVM.UserRole))
+            {
+                await roleManager.CreateAsync(new IdentityRole(registerVM.UserRole));
+            }
+
+            if (await roleManager.RoleExistsAsync(registerVM.UserRole))
+            {
+               await userManager.AddToRoleAsync(appUser, registerVM.UserRole); 
+            }
+
+            return Ok(new Response
+            {
+               Status = "Success",
+               Message = "User created Successfully!"
+            });
+        }
     }
 } 
