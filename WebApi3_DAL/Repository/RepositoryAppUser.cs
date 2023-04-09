@@ -79,7 +79,7 @@ namespace WebApi3_DAL.Repository
             }
         }
 
-        public AppUser GetById(int id)
+        public AppUser GetById(string id)
         {
             try
             {

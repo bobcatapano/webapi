@@ -32,14 +32,17 @@ namespace WebApi3_BAL.Services
             }
         }
 
-        public void DeleteUser(int Id)
+        public void DeleteUser(string Id)
         {
             try
             {
-                if (Id != 0)
+                if (Id != null)
                 {
                     var obj = _repository.GetAll().Where(x => x.Id == Id).FirstOrDefault();
-                    _repository.Delete(obj);
+                    if (obj != null)
+                    {
+                        _repository.Delete(obj);
+                    }
                 }
             }
             catch(Exception ex)
@@ -48,10 +51,10 @@ namespace WebApi3_BAL.Services
             }
         }
 
-        public void UpdateUser(int Id) {
+        public void UpdateUser(string Id) {
             try
             {
-                if (Id != 0)
+                if (Id != null)
                 {
                     var obj = _repository.GetAll().Where(x =>x.Id == Id).FirstOrDefault();
                     if (obj != null)

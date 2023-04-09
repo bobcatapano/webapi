@@ -13,6 +13,6 @@ namespace WebApi3_DAL.Contracts
         public void Update(T _object);
         public void DeleteAll(T _object);
         public IEnumerable<T> GetAll();
-        public T GetById(int id);
+        public T GetById(string id);
     }
 }

@@ -9,7 +9,6 @@ namespace WebApi3_DAL.Model
 {
     public class AppUser: IdentityUser
     {
-        public int Id { get; set; }
         public string? Name { get; set; }
         public string? AccountType { get; set; }
         public string? PhoneNo { get; set; }

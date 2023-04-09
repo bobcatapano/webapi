@@ -33,8 +33,7 @@ namespace webapi3.Controllers
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody]RegisterVM registerVM)
         {
-            var IsExist = await userManager.FindByNameAsync(registerVM.Name);
-            if (IsExist != null)
+            if (registerVM == null || string.IsNullOrEmpty(registerVM?.Name) || null != await userManager.FindByNameAsync(registerVM.Name))
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new Response
                 {
@@ -56,7 +55,16 @@ namespace webapi3.Controllers
                     IsDeleted = registerVM.IsDeleted
             };
 
-            var result = await userManager.CreateAsync(appUser, registerVM.Password);
+            if (string.IsNullOrEmpty(appUser.Password))
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new Response
+                {
+                    Status = "Error",
+                    Message = "Password cannot be null"
+                });
+            }
+
+            var result = await userManager.CreateAsync(appUser, appUser.Password);
 
             if (!result.Succeeded) {
                return StatusCode(StatusCodes.Status500InternalServerError, new Response
@@ -66,6 +74,8 @@ namespace webapi3.Controllers
                });
             }
 
+
+            // This will need more security, for example, anyone can make themself an 'Admin' Role.
             if (!await roleManager.RoleExistsAsync(registerVM.UserRole))
             {
                 await roleManager.CreateAsync(new IdentityRole(registerVM.UserRole));
